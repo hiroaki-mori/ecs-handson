@@ -1,72 +1,48 @@
-ECS-handson
+step0:Dockerに触れてみる
 ====
 
-# 今回作るもの
-元ソースはこちら
-https://github.com/pynamodb/PynamoDB/tree/master/examples/url_shortener
+#Docker Hubからローカルへイメージを保存
 
-これを コンテナ化して
-
-- ローカルPCのDockerで動かす
-- AWS上のECSで動かす
-
-# 事前準備
-## `docker` コマンドが通る
 ```
-docker ps
-
-接続できないとかエラーが出ないこと
+# ubuntuの公式イメージを保存
+docker pull ubuntu
 ```
 
-## `aws` コマンドが使えて、自分のアカウントのcredentialが仕込まれている
+#ローカルで保持しているイメージ一覧
+`docker images`
+
+#コンテナを起動
+
 ```
-aws s3 ls
-
-
-自分のS3バケットが見える
-```
-
-## うまく動かない人は
-いろいろはいったAMIを用意しておくので、ローカルでの作業をEC2でやりましょう。
-`ami-0dd817395062d54ca`
-
-- SSHが必要
-- SG設定としては下記を開ける
-  - 22 (ssh)
-  - 8000-8010 (dynamo-local)
-  - 5000-5010 (flask)
-- 1台でOK
-
-# ECS環境構築
-時間がかかるので、CloudFromationでサクッと構築。
-内容は後で説明します。
-
-
-# アプリケーションをローカルで動かす (時間があれば)
-![overview](https://raw.githubusercontent.com/h-imaoka/ecs-handson/images/images/local.png)
-開始まで時間が余っている人向け！
-
-## ひつようなもの
-- docker
-- python 2.7 or 3
-- pip (python)
-
-## DynamoLocalのコンテナを動かす
-```
-docker pull cnadiminti/dynamodb-local
-docker run -d -p 8000:8000 cnadiminti/dynamodb-local
+# イメージ:ubuntuよりコンテナ起動
+docker run -it ubuntu
 ```
 
-shell へアクセスできるか調べる
-http://localhost:8000/shell
+#コンテナを停止
+上記で起動した場合、exitすると同時に停止される
+`docker stop`
+#コンテナの一覧取得
+IDや起動状況等が確認できる
+`docker ps -a`
+#コンテナの破棄
+`docker rm test {CONTAINER ID}`
 
-## パッケージインストール
-`pip install -r requrements.txt`
+#イメージの登録
 
-## 動かす
-`python shortener.py`
-
-http://localhost:5000
+```
+#起動
+docker run -it ubuntu
+#コンテナ内でファイル作成
+echo "Hello, World!" > test.txt
+ls
+exit
+#コンテナから新規イメージ登録
+docker commit {IMAGE ID} test-ubuntu:latest
+#新規イメージからコンテナ起動
+docker run -it test-ubuntu
+#コンテナ内でファイル確認
+cat test.txt
+```
 
 # 次へ
 
